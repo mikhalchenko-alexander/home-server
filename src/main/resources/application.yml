@@ -1,0 +1,6 @@
+spring.freemarker.settings.tag_syntax: square_bracket
+
+music.root_dir: '/home/user/music'
+logging:
+  level:
+    org.jaudiotagger: ERROR
