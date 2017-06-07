@@ -1,6 +1,6 @@
 spring.freemarker.settings.tag_syntax: square_bracket
 
-music.root_dir: '/home/user/music'
+music.root_dir: ${HOME_SERVER_MUSIC_ROOT:}
 logging:
   level:
     org.jaudiotagger: ERROR
