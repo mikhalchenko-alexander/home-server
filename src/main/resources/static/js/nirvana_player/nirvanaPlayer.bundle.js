@@ -50032,6 +50032,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
   var audio = $module$kotlinx_html_js.kotlinx.html.audio_pitgtg$;
   var div = $module$kotlinx_html_js.kotlinx.html.div_59el9d$;
   var println = Kotlin.kotlin.io.println_s8jyv4$;
+  var set_style = $module$kotlinx_html_js.kotlinx.html.set_style_ueiko3$;
+  var span = $module$kotlinx_html_js.kotlinx.html.span_fqsp1s$;
+  var span_0 = $module$kotlinx_html_js.kotlinx.html.span_6djfml$;
+  var set_onClickFunction = $module$kotlinx_html_js.kotlinx.html.js.set_onClickFunction_pszlq2$;
   function Controls() {
     var tmp$;
     this.audio_0 = Kotlin.isType(tmp$ = audio(get_create(document), void 0, Controls$audio$lambda), HTMLAudioElement) ? tmp$ : Kotlin.throwCCE();
@@ -50070,7 +50074,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
       root.appendChild(this.controls_0.controlsDiv);
     }
   }
-  Player.prototype.onTrackClicked_sjc2t3$ = function (trackClickEvent) {
+  Player.prototype.onTrackClicked_4mm24x$ = function (trackClickEvent) {
     this.controls_0.setTrack_6hosri$(trackClickEvent.title, trackClickEvent.url, trackClickEvent.duration);
   };
   Player.$metadata$ = {
@@ -50078,16 +50082,91 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     simpleName: 'Player',
     interfaces: [PlayList$TrackClickListener]
   };
-  function PlayList(playlistUrl, trackClickListener) {
+  function PlayList(trackListUrl, trackClickListener) {
     this.trackClickListener = trackClickListener;
     this.playlistDiv = div(get_create(document), 'player-playlist');
-    this.loadPlaylist_0(playlistUrl, PlayList_init$lambda(this));
+    this.loadTrackList_0(trackListUrl, PlayList_init$lambda(this));
   }
+  PlayList.prototype.toggleClass_9bm2zh$ = function ($receiver, cl) {
+    if ($receiver.classList.contains(cl)) {
+      $receiver.classList.remove(cl);
+    }
+     else {
+      $receiver.classList.add(cl);
+    }
+  };
+  function PlayList$renderTrackList$lambda(closure$margin) {
+    return function ($receiver) {
+      set_style($receiver, 'margin-left: ' + closure$margin + 'px');
+    };
+  }
+  function PlayList$renderTrackList$lambda_0(closure$trackList) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$trackList.name);
+    };
+  }
+  function PlayList$renderTrackList$lambda_1(closure$trackListDiv, this$PlayList) {
+    return function (it) {
+      this$PlayList.toggleClass_9bm2zh$(closure$trackListDiv, 'opened');
+    };
+  }
+  PlayList.prototype.renderTrackList_0 = function (trackList, margin) {
+    if (margin === void 0)
+      margin = 0;
+    var tmp$, tmp$_0;
+    var trackListDiv = div(get_create(document), 'player-playlist-track-list', PlayList$renderTrackList$lambda(margin));
+    var trackListNameSpan = span(get_create(document), 'track-list-name', PlayList$renderTrackList$lambda_0(trackList));
+    trackListNameSpan.onclick = PlayList$renderTrackList$lambda_1(trackListDiv, this);
+    trackListDiv.appendChild(trackListNameSpan);
+    if ((tmp$ = trackList.folders) != null) {
+      var tmp$_1;
+      for (tmp$_1 = 0; tmp$_1 !== tmp$.length; ++tmp$_1) {
+        var element = tmp$[tmp$_1];
+        trackListDiv.appendChild(this.renderTrackList_0(element, margin + 10 | 0));
+      }
+    }
+    if ((tmp$_0 = trackList.tracks) != null) {
+      var tmp$_2;
+      for (tmp$_2 = 0; tmp$_2 !== tmp$_0.length; ++tmp$_2) {
+        var element_0 = tmp$_0[tmp$_2];
+        trackListDiv.appendChild(this.renderTrack_0(element_0, margin));
+      }
+    }
+    return trackListDiv;
+  };
+  function PlayList$renderTrack$lambda$lambda(closure$track) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$track.title + ' (' + closure$track.duration + ')');
+    };
+  }
+  function PlayList$renderTrack$lambda$lambda_0(closure$track, this$PlayList) {
+    return function (it) {
+      this$PlayList.fireTrackClicked_0(closure$track.title, closure$track.url, closure$track.duration);
+    };
+  }
+  function PlayList$renderTrack$lambda(closure$margin, closure$track, this$PlayList) {
+    return function ($receiver) {
+      set_style($receiver, 'margin-left: ' + closure$margin + 'px');
+      var $receiver_0 = $receiver.attributes;
+      var key = 'data-track-url';
+      var value = closure$track.url;
+      $receiver_0.put_xwzc9p$(key, value);
+      var $receiver_1 = $receiver.attributes;
+      var key_0 = 'data-track-title';
+      var value_0 = closure$track.title;
+      $receiver_1.put_xwzc9p$(key_0, value_0);
+      span_0($receiver, 'track-title', PlayList$renderTrack$lambda$lambda(closure$track));
+      set_onClickFunction($receiver, PlayList$renderTrack$lambda$lambda_0(closure$track, this$PlayList));
+    };
+  }
+  PlayList.prototype.renderTrack_0 = function (track, margin) {
+    return div(get_create(document), 'player-playlist-track', PlayList$renderTrack$lambda(margin, track, this));
+  };
   PlayList.prototype.fireTrackClicked_0 = function (title, url, duration) {
     var event = new PlayList$TrackClickEvent(title, duration, url);
-    this.trackClickListener.onTrackClicked_sjc2t3$(event);
+    this.trackClickListener.onTrackClicked_4mm24x$(event);
   };
-  function PlayList$loadPlaylist$lambda(closure$xhr, closure$onSuccess) {
+  function PlayList$loadTrackList$lambda(closure$xhr, closure$onSuccess) {
     return function (it) {
       if (closure$xhr.readyState === XMLHttpRequest.DONE) {
         if (closure$xhr.status === Kotlin.toShort(200)) {
@@ -50100,11 +50179,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
       }
     };
   }
-  PlayList.prototype.loadPlaylist_0 = function (playlistUrl, onSuccess) {
+  PlayList.prototype.loadTrackList_0 = function (playlistUrl, onSuccess) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', playlistUrl, true);
     xhr.send();
-    xhr.onreadystatechange = PlayList$loadPlaylist$lambda(xhr, onSuccess);
+    xhr.onreadystatechange = PlayList$loadTrackList$lambda(xhr, onSuccess);
   };
   function PlayList$Track(title, duration, url) {
     this.title = title;
@@ -50116,7 +50195,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     simpleName: 'Track',
     interfaces: []
   };
-  function PlayList$TrackList(tracks) {
+  function PlayList$TrackList(name, folders, tracks) {
+    this.name = name;
+    this.folders = folders;
     this.tracks = tracks;
   }
   PlayList$TrackList.$metadata$ = {
@@ -50141,35 +50222,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     simpleName: 'TrackClickEvent',
     interfaces: []
   };
-  function PlayList_init$lambda$lambda$lambda(closure$track) {
-    return function ($receiver) {
-      var $receiver_0 = $receiver.attributes;
-      var key = 'data-track-url';
-      var value = closure$track.url;
-      $receiver_0.put_xwzc9p$(key, value);
-      var $receiver_1 = $receiver.attributes;
-      var key_0 = 'data-track-title';
-      var value_0 = closure$track.title;
-      $receiver_1.put_xwzc9p$(key_0, value_0);
-      $receiver.unaryPlus_pdl1vz$(closure$track.title + ' (' + closure$track.duration + ')');
-    };
-  }
-  function PlayList_init$lambda$lambda$lambda_0(closure$track, this$PlayList) {
-    return function (it) {
-      this$PlayList.fireTrackClicked_0(closure$track.title, closure$track.url, closure$track.duration);
-    };
-  }
   function PlayList_init$lambda(this$PlayList) {
-    return function (playlist) {
-      var $receiver = playlist.tracks;
-      var tmp$;
-      for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-        var element = $receiver[tmp$];
-        var this$PlayList_0 = this$PlayList;
-        var trackDiv = div(get_create(document), void 0, PlayList_init$lambda$lambda$lambda(element));
-        trackDiv.onclick = PlayList_init$lambda$lambda$lambda_0(element, this$PlayList_0);
-        this$PlayList_0.playlistDiv.appendChild(trackDiv);
-      }
+    return function (it) {
+      this$PlayList.playlistDiv.appendChild(this$PlayList.renderTrackList_0(it));
     };
   }
   PlayList.$metadata$ = {
@@ -50182,8 +50237,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     new Player();
   }
   var package$com = _.com || (_.com = {});
-  var package$norby = package$com.norby || (package$com.norby = {});
-  var package$nirvana_player = package$norby.nirvana_player || (package$norby.nirvana_player = {});
+  var package$anahoret = package$com.anahoret || (package$com.anahoret = {});
+  var package$nirvana_player = package$anahoret.nirvana_player || (package$anahoret.nirvana_player = {});
   var package$components = package$nirvana_player.components || (package$nirvana_player.components = {});
   package$components.Controls = Controls;
   package$components.Player = Player;
@@ -50209,7 +50264,7 @@ exports = module.exports = __webpack_require__(5)(undefined);
 
 
 // module
-exports.push([module.i, "#nirvana-player .player-controls {\n  display: inline-block;\n  width: 70%;\n}\n#nirvana-player .player-controls audio {\n  width: 100%;\n}\n#nirvana-player .player-playlist {\n  display: inline-block;\n  width: 30%;\n}\n", ""]);
+exports.push([module.i, "#nirvana-player .player-controls {\n  width: 512px;\n}\n#nirvana-player .player-controls audio {\n  width: 100%;\n}\n#nirvana-player .player-playlist {\n  border: 1px solid #000;\n  padding: 5px;\n  display: inline-block;\n  width: 500px;\n}\n#nirvana-player .player-playlist .player-playlist-track-list {\n  cursor: default;\n}\n#nirvana-player .player-playlist .player-playlist-track-list:before {\n  content: \"+\";\n}\n#nirvana-player .player-playlist .player-playlist-track-list > .player-playlist-track {\n  display: none;\n}\n#nirvana-player .player-playlist .player-playlist-track-list > .player-playlist-track-list {\n  display: none;\n}\n#nirvana-player .player-playlist .player-playlist-track-list.opened:before {\n  content: \"-\";\n}\n#nirvana-player .player-playlist .player-playlist-track-list.opened > .player-playlist-track {\n  display: block;\n}\n#nirvana-player .player-playlist .player-playlist-track-list.opened > .player-playlist-track-list {\n  display: block;\n}\n#nirvana-player .player-playlist .track-list-name,\n#nirvana-player .player-playlist .track-title {\n  cursor: pointer;\n}\n#nirvana-player .player-playlist .player-playlist-track:last-child {\n  border-bottom: 1px solid #a9a9a9;\n  margin-bottom: 5px;\n}\n", ""]);
 
 // exports
 
