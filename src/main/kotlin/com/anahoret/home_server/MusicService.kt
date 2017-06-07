@@ -17,7 +17,7 @@ class MusicService {
 
   fun getTrackList(): TrackList {
     val rootDir = File(rootDirPath)
-    require(rootDir.isDirectory, { "$rootDirPath is not a directory" })
+    require(rootDir.isDirectory, { "\"$rootDirPath\" is not a directory" })
 
     return walkDir(rootDir)
   }
