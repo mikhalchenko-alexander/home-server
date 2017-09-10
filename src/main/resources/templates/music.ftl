@@ -6,7 +6,7 @@
 [#include "menu.ftl" /]
 <hr>
 
-<div id="nirvana-player" data-playlist-url="[@spring.url "/music/playlist"/]"></div>
+<div id="nirvana-player" data-media-library-url="[@spring.url "/music/playlist"/]"></div>
 
 <hr>
 [#include "logoutForm.ftl" /]
