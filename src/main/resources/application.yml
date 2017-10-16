@@ -4,3 +4,5 @@ music.root_dir: ${HOME_SERVER_MUSIC_ROOT:}
 logging:
   level:
     org.jaudiotagger: ERROR
+server:
+  port: 8081

@@ -1,7 +1,7 @@
 package com.anahoret.home_server
 
+import com.anahoret.home_server.models.Folder
 import com.anahoret.home_server.models.Track
-import com.anahoret.home_server.models.TrackList
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
@@ -15,16 +15,17 @@ class MusicService {
   @Value("\${music.root_dir}")
   lateinit var rootDirPath: String
 
-  fun getTrackList(): TrackList {
+  fun getMediaLibrary(): Folder {
     val rootDir = File(rootDirPath)
     require(rootDir.isDirectory, { "\"$rootDirPath\" is not a directory" })
 
-    return walkDir(rootDir)
+    return walkDir(rootDir, isRoot = true)
   }
 
-  private fun walkDir(dir: File): TrackList {
+  private fun walkDir(dir: File, isRoot: Boolean = false): Folder {
+    val name = if (isRoot) "ROOT" else dir.name
     val tl = dir.listFiles()?.let { children ->
-      val trackLists = children.filter(File::isDirectory).map(this::walkDir).toTypedArray()
+      val folders = children.filter(File::isDirectory).map { walkDir(it) }.toTypedArray()
       val tracks = children.filter { it.isFile && it.extension == "mp3" }
         .map {
           val audioFile = AudioFileIO.read(it)
@@ -32,11 +33,9 @@ class MusicService {
           val localTime = LocalTime.ofSecondOfDay(duration.toLong())
           Track(it.name, localTime.toString(), encodeUrl(it.absolutePath))
         }.toTypedArray()
-
-      TrackList(dir.name, trackLists, tracks)
+      Folder(name, folders, tracks)
     }
-
-    return tl ?: TrackList.empty()
+    return tl ?: Folder(name, emptyArray(), emptyArray())
   }
 
   private fun encodeUrl(filePath: String): String {

@@ -1,7 +1,7 @@
 package com.anahoret.home_server.controller
 
 import com.anahoret.home_server.MusicService
-import com.anahoret.home_server.models.TrackList
+import com.anahoret.home_server.models.Folder
 import org.apache.tika.config.TikaConfig
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
@@ -22,10 +22,10 @@ class MusicController(
   @GetMapping
   fun music(): String = "music"
 
-  @GetMapping("playlist")
+  @GetMapping("medialibrary")
   @ResponseBody
-  fun playlist(): TrackList {
-    return musicService.getTrackList()
+  fun mediaLibrary(): Folder {
+    return musicService.getMediaLibrary()
   }
 
   @GetMapping("track")
