@@ -8,7 +8,9 @@
 
 <div id="player-root"
      data-media-library-url="[@spring.url "/music/medialibrary"/]"
-     data-track-url="[@spring.url "/music/track"/]"></div>
+     data-track-url="[@spring.url "/music/track"/]"
+     data-icons-url="[@spring.url "/images/icons"/]"
+></div>
 
 <hr>
 [#include "logoutForm.ftl" /]
