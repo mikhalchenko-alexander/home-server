@@ -32,8 +32,13 @@ class MusicService {
   private fun walkDir(dir: File, isRoot: Boolean = false): FolderDto {
     val name = if (isRoot) "ROOT" else dir.name
     val tl = dir.listFiles()?.let { children ->
-      val folders = children.filter(File::isDirectory).map { walkDir(it) }
-      val tracks = children.filter { it.isFile && it.extension == "mp3" }
+      val folders = children
+        .filter(File::isDirectory)
+        .sortedBy { it.name }
+        .map { walkDir(it) }
+      val tracks = children
+        .filter { it.isFile && it.extension == "mp3" }
+        .sortedBy { it.name }
         .map {
           val audioFile = AudioFileIO.read(it)
           val duration = audioFile.audioHeader.trackLength
