@@ -1,13 +1,15 @@
 package com.anahoret.home_server
 
-import com.anahoret.home_server.models.Folder
-import com.anahoret.home_server.models.Track
+import com.anahoret.home_server.models.FolderDto
+import com.anahoret.home_server.models.TrackDto
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.id3.ID3v23Tag
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
-import java.net.URLEncoder
-import org.jaudiotagger.audio.AudioFileIO
-import java.time.LocalTime
+import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 
 @Service
 class MusicService {
@@ -15,31 +17,39 @@ class MusicService {
   @Value("\${music.root_dir}")
   lateinit var rootDirPath: String
 
-  fun getMediaLibrary(): Folder {
+  private val trackId = AtomicLong(0)
+  private val folderId = AtomicLong(0)
+  private val trackMap = Collections.synchronizedMap(mutableMapOf<Long, String>())
+
+  val ml by lazy {
     val rootDir = File(rootDirPath)
     require(rootDir.isDirectory, { "\"$rootDirPath\" is not a directory" })
-
-    return walkDir(rootDir, isRoot = true)
+    walkDir(rootDir, isRoot = true)
   }
 
-  private fun walkDir(dir: File, isRoot: Boolean = false): Folder {
+  fun getMediaLibrary(): FolderDto = ml
+
+  private fun walkDir(dir: File, isRoot: Boolean = false): FolderDto {
     val name = if (isRoot) "ROOT" else dir.name
     val tl = dir.listFiles()?.let { children ->
-      val folders = children.filter(File::isDirectory).map { walkDir(it) }.toTypedArray()
+      val folders = children.filter(File::isDirectory).map { walkDir(it) }
       val tracks = children.filter { it.isFile && it.extension == "mp3" }
         .map {
           val audioFile = AudioFileIO.read(it)
           val duration = audioFile.audioHeader.trackLength
-          val localTime = LocalTime.ofSecondOfDay(duration.toLong())
-          Track(it.name, localTime.toString(), encodeUrl(it.absolutePath))
-        }.toTypedArray()
-      Folder(name, folders, tracks)
+          val tag = audioFile.tag as ID3v23Tag
+          val title = tag.getFirst(FieldKey.TITLE)
+          val artist = tag.getFirst(FieldKey.ARTIST)
+          val album = tag.getFirst(FieldKey.ALBUM)
+          val id = trackId.getAndIncrement()
+          trackMap.put(id, it.absolutePath)
+          TrackDto(id, title, artist, album, duration)
+        }
+      FolderDto(folderId.getAndIncrement(), name, folders, tracks)
     }
-    return tl ?: Folder(name, emptyArray(), emptyArray())
+    return tl ?: FolderDto(folderId.getAndIncrement(), name, emptyList(), emptyList())
   }
 
-  private fun encodeUrl(filePath: String): String {
-    return "/music/track?url=${URLEncoder.encode(filePath, "UTF-8")}"
-  }
+  fun getFilePath(trackId: Long): String? = trackMap[trackId]
 
 }

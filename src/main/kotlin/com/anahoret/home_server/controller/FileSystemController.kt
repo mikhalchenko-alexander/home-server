@@ -51,9 +51,8 @@ class FileSystemController(
   }
 
   @GetMapping("file")
-  fun file(@RequestParam("url") url: String): ResponseEntity<ByteArray> {
-    return FileResponse.create(url, tika)
-  }
+  fun file(@RequestParam("url") url: String): ResponseEntity<ByteArray> =
+    FileResponse.createFromUrl(url, tika)
 
   @ExceptionHandler
   private fun handleFileNotFoundException(e: FileNotFoundException, response: HttpServletResponse) {

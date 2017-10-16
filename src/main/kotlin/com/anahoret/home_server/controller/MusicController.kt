@@ -1,14 +1,15 @@
 package com.anahoret.home_server.controller
 
 import com.anahoret.home_server.MusicService
-import com.anahoret.home_server.models.Folder
+import com.anahoret.home_server.models.FolderDto
 import org.apache.tika.config.TikaConfig
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
@@ -24,13 +25,13 @@ class MusicController(
 
   @GetMapping("medialibrary")
   @ResponseBody
-  fun mediaLibrary(): Folder {
-    return musicService.getMediaLibrary()
-  }
+  fun mediaLibrary(): FolderDto = musicService.getMediaLibrary()
 
-  @GetMapping("track")
-  fun file(@RequestParam("url") url: String): ResponseEntity<ByteArray> {
-    return FileResponse.create(url, tika)
+  @GetMapping("track/{id}")
+  fun file(@PathVariable("id") trackId: Long): ResponseEntity<ByteArray> {
+    return musicService.getFilePath(trackId)?.let { filePath ->
+      FileResponse.createFromPath(filePath, tika)
+    } ?: ResponseEntity(HttpStatus.NOT_FOUND)
   }
 
 }
