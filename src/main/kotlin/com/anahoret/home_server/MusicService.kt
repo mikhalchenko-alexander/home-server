@@ -3,8 +3,8 @@ package com.anahoret.home_server
 import com.anahoret.home_server.models.FolderDto
 import com.anahoret.home_server.models.TrackDto
 import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.audio.mp3.MP3File
 import org.jaudiotagger.tag.FieldKey
-import org.jaudiotagger.tag.id3.ID3v23Tag
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
@@ -39,16 +39,18 @@ class MusicService {
       val tracks = children
         .filter { it.isFile && it.extension == "mp3" }
         .sortedBy { it.name }
-        .map {
-          val audioFile = AudioFileIO.read(it)
+        .map { file ->
+          val audioFile = AudioFileIO.read(file) as MP3File
           val duration = audioFile.audioHeader.trackLength
-          val tag = audioFile.tag as ID3v23Tag
-          val title = tag.getFirst(FieldKey.TITLE)
-          val artist = tag.getFirst(FieldKey.ARTIST)
-          val album = tag.getFirst(FieldKey.ALBUM)
+          val tag = audioFile.iD3v2Tag
           val id = trackId.getAndIncrement()
-          trackMap.put(id, it.absolutePath)
-          TrackDto(id, title, artist, album, duration)
+          tag?.let {
+            val title = tag.getFirst(FieldKey.TITLE)
+            val artist = tag.getFirst(FieldKey.ARTIST)
+            val album = tag.getFirst(FieldKey.ALBUM)
+            trackMap.put(id, file.absolutePath)
+            TrackDto(id, title, artist, album, duration)
+          } ?: TrackDto(id, file.name, "Unknown", "Unknown", duration)
         }
       FolderDto(folderId.getAndIncrement(), name, folders, tracks)
     }
