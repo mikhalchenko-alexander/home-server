@@ -1,7 +1,7 @@
 [#import "spring.ftl" as spring]
 [#import "page.ftl" as page]
 
-[@page.page "Files"]
+[@page.page "Music"]
 
 [#include "menu.ftl" /]
 <hr>
