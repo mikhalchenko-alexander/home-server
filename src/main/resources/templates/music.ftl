@@ -3,6 +3,8 @@
 
 [@page.page "Music"]
 
+<link rel="stylesheet" href="/css/music.css">
+
 [#include "menu.ftl" /]
 <hr>
 
